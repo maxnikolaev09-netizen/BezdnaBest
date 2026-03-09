@@ -4,10 +4,3 @@ services:
     runtime: node
     buildCommand: npm install
     startCommand: node server.js
-    envVars:
-      - key: DATA_DIR
-        value: /opt/render/project/data
-    disk:
-      name: bezdna-data
-      mountPath: /opt/render/project/data
-      sizeGB: 1
