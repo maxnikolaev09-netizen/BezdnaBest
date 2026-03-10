@@ -67,6 +67,17 @@
     /* ── LAYOUT ───────────────────────────────────────────────────── */
     .app{display:flex;height:100vh;width:100%;overflow:hidden}
 
+    /* ── MOBILE ───────────────────────────────────────────────────── */
+    @media(max-width:640px){
+      .sidebar{width:100%;min-width:100%;transition:transform .25s ease}
+      .main{position:absolute;inset:0;transform:translateX(100%);transition:transform .25s ease;z-index:10}
+      .app.chat-open .main{transform:translateX(0)}
+      .app.chat-open .sidebar{transform:translateX(-100%)}
+      .mob-back{display:flex!important}
+    }
+    .mob-back{display:none;align-items:center;justify-content:center;width:36px;height:36px;background:var(--bg3);border-radius:10px;color:var(--t2);flex-shrink:0;margin-right:4px}
+    .mob-back svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
     /* ── SIDEBAR ──────────────────────────────────────────────────── */
     .sidebar{width:320px;min-width:320px;display:flex;flex-direction:column;background:var(--bg2);border-right:1px solid var(--br)}
     .sb-top{padding:16px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--br)}
@@ -578,7 +589,7 @@ function Msg({msg,me,isGroup,showAv,onDel,onImg}){
 }
 
 // ── CHAT VIEW ─────────────────────────────────────────────────────────────────
-function Chat({chat,me}){
+function Chat({chat,me,onBack}){
   const[text,sText]=useState('');
   const[msgs,sMsgs]=useState([]);
   const[sending,sSending]=useState(false);
@@ -685,6 +696,9 @@ function Chat({chat,me}){
 
   return h(React.Fragment,null,
     h('div',{className:'ch-head'},
+      h('button',{className:'mob-back',onClick:onBack},
+        h('svg',{viewBox:'0 0 24 24'},h('polyline',{points:'15 18 9 12 15 6'}))
+      ),
       h(Av,{name,size:'md',isGroup:chat.isGroup}),
       h('div',{className:'ch-info'},
         h('div',{className:'ch-name'},name),
@@ -896,7 +910,7 @@ function App(){
   );
   if(!me)return h(Auth,{onLogin:u=>sMe(u)});
 
-  return h('div',{className:'app'},
+  return h('div',{className:'app'+(active?' chat-open':'')},
     // SIDEBAR
     h('div',{className:'sidebar'},
       h('div',{className:'sb-top'},
@@ -942,7 +956,7 @@ function App(){
     // MAIN
     h('div',{className:'main'},
       active
-        ?h(Chat,{key:active.id,chat:active,me})
+        ?h(Chat,{key:active.id,chat:active,me,onBack:()=>sActive(null)})
         :h('div',{className:'empty'},
             h('div',{className:'empty-ico'},Ic.chat),
             h('div',{className:'empty-title'},spyWelcome),
